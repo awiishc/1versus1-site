@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="description" content="1VERSUS1 official landing page." />
+  <title>1VERSUS1 | Futsal Tournament</title>
+  <style>
+    :root {
+      --poster-w: min(100vw, calc(100dvh * 0.5625));
+      --poster-h: min(100dvh, calc(100vw * 1.7777778));
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      width: 100%; height: 100%; margin: 0; padding: 0;
+      overflow: hidden; overscroll-behavior: none; touch-action: manipulation;
+      background: #050505; font-family: Arial, Helvetica, sans-serif;
+    }
+    body { min-height: 100dvh; display: grid; place-items: center; }
+    .stage {
+      position: relative; width: var(--poster-w); height: var(--poster-h);
+      max-width: 100vw; max-height: 100dvh; overflow: hidden; isolation: isolate;
+      background: #050505 url("web design.jpg") center / 100% 100% no-repeat;
+    }
+    .btn {
+      position: absolute; display: block; width: 34%; aspect-ratio: 1 / 1;
+      border: 0; padding: 0; margin: 0; background: transparent; cursor: pointer;
+      text-decoration: none; transform: translate(-50%, -50%);
+    }
+    .btn img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
+    .btn:focus-visible { outline: 2px solid rgba(255,255,255,.85); outline-offset: -26%; }
+
+    /* Button placement follows the supplied web design reference. */
+    .swiss { left: 34.2%; top: 48.2%; }
+    .lineup { left: 67.0%; top: 48.1%; }
+    .rulebook { left: 34.2%; top: 58.0%; }
+    .wall { left: 66.8%; top: 58.0%; }
+    .booking { left: 50.0%; top: 67.0%; width: 37%; }
+
+    .audio-hint {
+      position: absolute; right: 3%; bottom: 4.5%; z-index: 20;
+      border: 1px solid rgba(255,255,255,.45); background: rgba(0,0,0,.5); color: #fff;
+      border-radius: 999px; padding: .45em .75em;
+      font-size: clamp(8px, calc(var(--poster-w) * .019), 16px);
+      font-weight: 800; letter-spacing: .05em; text-transform: uppercase; cursor: pointer;
+      display: none;
+    }
+    .audio-hint.show { display: block; }
+
+    @media (max-aspect-ratio: 9/16) { .stage { width: 100vw; height: calc(100vw * 1.7777778); } }
+    @media (min-aspect-ratio: 9/16) { .stage { width: calc(100dvh * .5625); height: 100dvh; } }
+  </style>
+</head>
+<body>
+  <main class="stage" aria-label="1VERSUS1 landing page">
+    <a class="btn swiss" href="#swiss-bracket" aria-label="Swiss Bracket"><img src="swiss bracket-01.png" alt="Swiss Bracket"></a>
+    <a class="btn lineup" href="https://1-versus-1-player-line-up.vercel.app" aria-label="Player Line-Up"><img src="player lineup-01.png" alt="Player Line-Up"></a>
+    <a class="btn rulebook" href="https://drive.google.com/file/d/1x6auYlvJqHG_QlkwKm8QA0lbtPGebv_m/view?usp=drivesdk" aria-label="Rule Book"><img src="rulebook-01.png" alt="Rule Book"></a>
+    <a class="btn wall" href="#wall-of-fame" aria-label="Wall of Fame"><img src="wall of fame-01.png" alt="Wall of Fame"></a>
+    <a class="btn booking" href="https://forms.gle/PM94wkZifZomJZ8E9" aria-label="Booking Slot"><img src="booking slot-01.png" alt="Booking Slot"></a>
+
+    <button class="audio-hint" id="audioHint" type="button">Tap for sound</button>
+    <audio id="bgAudio" src="1VERSUS1.mp3" preload="auto" playsinline></audio>
+  </main>
+
+  <script>
+    document.addEventListener('gesturestart', function (event) { event.preventDefault(); });
+    document.addEventListener('gesturechange', function (event) { event.preventDefault(); });
+    document.addEventListener('wheel', function (event) { if (event.ctrlKey) event.preventDefault(); }, { passive: false });
+    document.addEventListener('keydown', function (event) {
+      if ((event.ctrlKey || event.metaKey) && ['+', '-', '=', '_'].includes(event.key)) event.preventDefault();
+    });
+
+    const audio = document.getElementById('bgAudio');
+    const audioHint = document.getElementById('audioHint');
+    const segmentEnd = 29;
+
+    function playSegment() {
+      audio.currentTime = 0;
+      audio.volume = 1;
+      const playRequest = audio.play();
+      if (playRequest && typeof playRequest.catch === 'function') {
+        playRequest.then(() => audioHint.classList.remove('show')).catch(() => audioHint.classList.add('show'));
+      }
+    }
+
+    audio.addEventListener('timeupdate', function () {
+      if (audio.currentTime >= segmentEnd) {
+        audio.currentTime = 0;
+        audio.play().catch(() => audioHint.classList.add('show'));
+      }
+    });
+    audio.addEventListener('ended', playSegment);
+    audioHint.addEventListener('click', playSegment);
+    window.addEventListener('pointerdown', function () { if (audio.paused) playSegment(); }, { once: true });
+    window.addEventListener('load', playSegment);
+  </script>
+</body>
+</html>
